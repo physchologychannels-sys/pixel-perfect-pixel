@@ -1,0 +1,59 @@
+# Deploys the static site to GitHub Pages on every push to main.
+# Free hosting, no time limit: the site stays live at
+# https://<your-username>.github.io/<repo-name>/ for as long as the repository exists.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      # A repository named <username>.github.io is served from the root;
+      # any other name is served from /<repo>/, and the site needs that prefix.
+      - name: Compute the site's base path
+        run: |
+          REPO="${GITHUB_REPOSITORY#*/}"
+          OWNER="${GITHUB_REPOSITORY%/*}"
+          if [ "$REPO" = "$OWNER.github.io" ]; then BASE="/"; else BASE="/$REPO"; fi
+          echo "VITE_BASE_PATH=$BASE" >> "$GITHUB_ENV"
+
+      - run: bun install --frozen-lockfile
+
+      - run: bun run build
+
+      - name: Assemble the static site
+        run: |
+          mkdir -p site
+          cp -r .output/public/. site/
+          touch site/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
