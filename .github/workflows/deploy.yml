@@ -41,7 +41,7 @@ jobs:
       - name: Assemble the static site
         run: |
           mkdir -p site
-          cp -r .output/public/. site/
+          cp -r dist/client/. site/
           touch site/.nojekyll
 
       - uses: actions/upload-pages-artifact@v3
