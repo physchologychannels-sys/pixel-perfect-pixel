@@ -9,7 +9,7 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 // GitHub Pages hosts a project site at /<repo>/. The Pages workflow sets
 // VITE_BASE_PATH to that prefix; unset (editor preview, Lovable deployment),
 // the site serves from the root exactly as before.
-const basePath = process.env.VITE_BASE_PATH || "/";
+const basePath = process.env["VITE_BASE_PATH"] || "/";
 
 export default defineConfig({
   tanstackStart: {
