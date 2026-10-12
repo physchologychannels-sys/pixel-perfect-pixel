@@ -11,4 +11,4 @@
 
 ## Architecture rules
 
-- The site prerenders `/` to static HTML for GitHub Pages: `pages`/`prerender` in `vite.config.ts`, base path from `VITE_BASE_PATH` (set only by `.github/workflows/deploy.yml`), router basepath assigned in `src/router.tsx` outside the object literal so the toolchain's literal-`basepath` source scan does not skip the route manifest. Static output lands in `dist/client/`.
+- The site prerenders `/` to static HTML for GitHub Pages: `pages`/`prerender` in `vite.config.ts`, base path from `VITE_BASE_PATH` (set only by `.github/workflows/deploy.yml`), router basepath assigned in `src/router.tsx` outside the object literal so the toolchain's literal-`basepath` source scan does not skip the route manifest. Static output lands in `.output/public/` (GitHub Actions) or `dist/client/` (sandbox); the deploy workflow picks whichever has `index.html`.
