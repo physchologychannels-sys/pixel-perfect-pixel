@@ -38,10 +38,17 @@ jobs:
 
       - run: bun run build
 
+      # The build writes browser files to .output/public on GitHub's machines
+      # and to dist/client elsewhere; use whichever contains index.html.
       - name: Assemble the static site
         run: |
           mkdir -p site
-          cp -r dist/client/. site/
+          for dir in .output/public dist/client; do
+            if [ -f "$dir/index.html" ]; then SRC="$dir"; break; fi
+          done
+          if [ -z "$SRC" ]; then echo "No built index.html found"; ls -R .output dist 2>/dev/null | head -50; exit 1; fi
+          echo "Using $SRC"
+          cp -r "$SRC"/. site/
           touch site/.nojekyll
 
       - uses: actions/upload-pages-artifact@v3
